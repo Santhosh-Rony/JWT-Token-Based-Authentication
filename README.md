@@ -14,45 +14,29 @@ root/
 └── README.md
 
 
-#Auth Flow :
+#More :
 
-+----------+            POST /login            +-----------------+
-|          |---------------------------------->|                 |
-|  Client  |  username & password (form-data) |   FastAPI App   |
-|          |<----------------------------------|  (login route)  |
-+----------+        JWT issued on success     +-----------------+
-       │                                          │
-       │ Store JWT (e.g. in memory/localStorage) │
-       └──────────────────────────────────────────┘
-                            
-       │                                          
-       │  GET /dashboard with                  
-       │  Authorization: Bearer <JWT>          
-       ▼                                          
+main.py calls into users/auth to validate login and build a JWT (config).
 
-+-----------------+         Depends on         +----------------------------+
-|                 |<--------------------------|                            |
-| FastAPI App     |   get_current_user()      | OAuth2PasswordBearer +     |
-| (dashboard)     |                           | JWT decode & verify logic  |
-+-----------------+-------------------------->+----------------------------+
-       │                                           │
-       │ Returns user info & message               │
-       │                                           │
-       └───────────────────────────────────────────┘
+It returns that JWT (schemas.Token).
 
-       │                                          
-       │  GET /admin with                        
-       │  Authorization: Bearer <JWT>          
-       ▼                                          
+On protected routes, FastAPI invokes dependencies, which uses config + users to decode and verify that token.
 
-+-----------------+        Depends on          +---------------------+
-|                 |<---------------------------|                     |
-| FastAPI App     |      admin_required()       | get_current_user()  |
-| (admin route)   |  (role check after decode)  |  + role‑check logic |
-+-----------------+--------------------------->+---------------------+
-       │                                           │
-       │ Returns admin‑only message                │
-       └───────────────────────────────────────────┘
+Role checks happen in dependencies.admin_required.
+
+This modular separation keeps concerns clean:
+
+config for settings
+
+schemas for data shapes
+
+auth for crypto
+
+users for user data
+
+dependencies for request‑time security
+
+main for HTTP routing
 
 
 #Connection :
