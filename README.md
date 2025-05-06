@@ -41,16 +41,16 @@ main for HTTP routing
 
 #Connection :
 
-    config --> auth
-    config --> dependencies
+config --> auth
+config --> dependencies
 
-    schemas --> users
-    schemas --> main
+schemas --> users
+schemas --> main
 
-    auth --> users
-    auth --> main
+auth --> users
+auth --> main
 
-    users --> dependencies
-    dependencies --> main
+users --> dependencies
+dependencies --> main
 
-    main[main.py] 
+main[main.py] 
